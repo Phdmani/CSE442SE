@@ -12,13 +12,16 @@ var usersRouter = require('./routes/users');
 
 var connection = mysql.createConnection({
     host:'localhost',
-    user:'root',
-    password:'expressBuffa@lo99',
-    database:'movieapp'
+    user:'bina',
+    password:'Bina@cse123',
+    database:'myDB'
 
 })
-connection.connect();
- 
+
+var username='';
+var password='';
+var title = '';
+
 global.db = connection;
 var app = express();
 
@@ -43,18 +46,34 @@ app.use('/users', usersRouter);
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
-app.post('/login',function(req,res){
+app.post('/user-logout', (req,res) =>{
+  username ='';
+  password ='';
+  res.redirect('/');
+
+  console.log('Logged Out')
+  console.log('User:'+username)
+
+})
+
+app.post('/user-login',function(req,res){
  
-    var username=req.body.username;
-    var password=req.body.password;
+    username=req.body.username;
+    password=req.body.password;
 
 
     if(username && password){
-      db.query('SELECT * FROM userinfo WHERE username=? AND password=?', [username,password],function(error,results,fields){
+      db.query('SELECT * FROM UserInfo WHERE username=? AND password=?', [username,password],function(err,results,fields){
+        if (err) throw err;
+        console.log("Connected!");
+        console.log(results)
         if(results.length){
           req.session.loggedin=true;
           req.session.username=username;
-          res.redirect('/');
+          res.redirect('/home');
+          console.log('Logged In')
+          console.log(username)
+
           res.end()
         }else{
           res.send("Invalid Username/Password");
@@ -67,13 +86,41 @@ app.post('/login',function(req,res){
 
 
 
+});
+
+app.post('/user-add-movie', (req,res) =>{
+  title =req.body.t
+})
+app.post('/user-add-movies', (req,res) =>{
+  console.log('hi')
+    title =req.body.user
+
+      console.log(title)
+      console.log(username)
+      if ( username =='') throw err;
+        db.query(`INSERT into Movies (title,users) VALUES('${title}','${username}')`,function(err,results,fields){
+        if (err) throw err;
+        console.log('success')
+
+
+})
+
+});
+app.post('/user-a-moviees',function(req,res){
+      title = req.body.title;
+        db.query('SELECT * FROM Movies WHERE users=?', [title],function(err,results,fields){
+        if (err) throw err;
+        console.log('success')
+
+
+})
 
 });
 
 app.post('/signup',function(req,res){
 
-    var username=req.body.username;
-    var password=req.body.password;
+    username=req.body.username;
+    password=req.body.password;
 
 
     if(username && password){
